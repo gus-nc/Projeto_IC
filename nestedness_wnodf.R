@@ -109,3 +109,52 @@ for (env in envs) { # For each environment
     (m*(m-1)+(n*(n-1)))
 }
   
+library(dplyr)
+library(tidyverse)
+how_much = factorial(20)/(factorial(10)*factorial(10))
+
+# Produce one big fat matrix
+data = read.csv("Data_filtered.csv", header=T, dec= ",", row.names=NULL)
+
+permutations = 1000 # number of permutations
+trilhas = sort(unique(data$"Trilha")) # unique sample points
+
+###-----Frequency wNODF---------------------------------------------------------
+rep_freq = 0
+for (n in permutations) {
+  rep_freq = rep_freq + 1
+  trail_samp = sample(trilhas, 10)
+  
+  # Produce an horizonral version of the matrix
+  data_filt = dplyr::select(data, c(1,3,6,7,11)) %>%  #selects relevant columns
+    group_by(Espécie, Classificação.2) %>% #groups by codigo and item
+    dplyr::summarise(Quantidade = sum(Quantidade)) %>% #sum quantity of each item
+    pivot_wider(names_from = Classificação.2,
+              values_from = Quantidade) %>%  
+    as.data.frame() %>% #changes dataset format to Codigo-row oriented
+    replace(is.na(.), 0) #removes NA and replaces with 0
+  
+  row.names(data_filt) = data_filt$Espécie
+  data_filt = dplyr:: select(data_filt, !Espécie)
+  data_filt = data_filt[,!names(data_filt) 
+                            %in% c("Não Identificado", "Semente", "Semente de capim", "Apenas substrato", "Vazio")]
+
+  # Filter the Matrice
+  cols_to_remove = which(colSums(data_filt) < 5) # Min of 5 prey items
+  if (length(cols_to_remove) > 0) { # Check if is a int(0)
+    data_filt = data_filt[, -cols_to_remove] # Remove columns
+  }
+  rows_to_remove = which(rowSums(data_filt) == 0) # Check if there are items without a predator
+  if (length(rows_to_remove) > 0) { # Check if is a int(0)
+    data_filt = data_filt[-rows_to_remove,] # Remove columns
+  }
+  
+  # Re-order the interaction matrices
+  row_order = order(rowSums(data_filt), decreasing = TRUE) # Calculate row sums
+  data_filt = data_filt[row_order, ] # Use the index vector to reorder the rows of the matrix
+  col_order = order(colSums(data_filt), decreasing = TRUE) # Calculate col sums
+  data_filt = data_filt[,col_order] # Use the index vector to reorder the cols of the matrix
+  
+}
+###-----Volume wNODF------------------------------------------------------------
+##------p_value AND ggplot------------------------------------------------------
