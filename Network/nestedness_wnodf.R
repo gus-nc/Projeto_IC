@@ -108,7 +108,7 @@ for (env in envs) { # For each environment
   WNODF_obs[[env]] = 2*(WNODFc[[env]]+WNODFr[[env]])/ # The final average of WNODF for the env matrix
     (m*(m-1)+(n*(n-1)))
 }
-  
+###-----  
 library(dplyr)
 library(tidyverse)
 how_much = factorial(20)/(factorial(10)*factorial(10))
@@ -116,18 +116,18 @@ how_much = factorial(20)/(factorial(10)*factorial(10))
 # Produce one big fat matrix
 data = read.csv("Data_filtered.csv", header=T, dec= ",", row.names=NULL)
 
-permutations = 1000 # number of permutations
+permutations = 100 # number of permutations
 trilhas = sort(unique(data$"Trilha")) # unique sample points
 
 ###-----Frequency wNODF---------------------------------------------------------
 rep_freq = 0
-for (n in permutations) {
+wNODF_freq = c()
+for (n in 1:permutations) {
   rep_freq = rep_freq + 1
   trail_samp = sample(trilhas, 10)
   
   # Produce an horizonral version of the matrix
-  data_filt = dplyr::select(data, c(1,3,6,7,11)) %>%  #selects relevant columns
-    group_by(Espécie, Classificação.2) %>% #groups by codigo and item
+  data_filt = group_by(data, Espécie, Classificação.2) %>% #groups by codigo and item
     dplyr::summarise(Quantidade = sum(Quantidade)) %>% #sum quantity of each item
     pivot_wider(names_from = Classificação.2,
               values_from = Quantidade) %>%  
@@ -155,6 +155,174 @@ for (n in permutations) {
   col_order = order(colSums(data_filt), decreasing = TRUE) # Calculate col sums
   data_filt = data_filt[,col_order] # Use the index vector to reorder the cols of the matrix
   
+  ### Calculate wNODF Frequency permutation networks
+  
+  # WNODFc values for cols
+  WNODFc_temp = 0 # Create a temporary object for WNODFc
+  for (i in 1:(ncol(data_filt)-1)) { # for every i:n-1
+    for (j in (i+1):ncol(data_filt)) { # and for every i+1:n
+      if(sum(data_filt[,i]) <= sum(data_filt[,j])) { # if F(ci) <= F(cj)
+        N_paired = 0        
+        }
+      else {
+        k_ij = 0 # number of 1's in ci = cj, if cj != 0?
+        N_j = sum(data_filt[,j] > 0) # Cells > 0 in cj
+        for (r in 1:nrow(data_filt)) { # for every row in t cols sum k_ij
+          if (data_filt[r,i] > data_filt[r,j] && data_filt[r,j] != 0){
+            k_ij = k_ij+1            }
+        }
+        N_paired = k_ij/N_j
+      }
+      WNODFc_temp = WNODFc_temp + N_paired 
+      } 
+    }
+  WNODFc = WNODFc_temp*100
+  # WNODFr 
+  WNODFr_temp = 0
+  for (i in 1:(nrow(data_filt)-1)) {
+    for (j in (i+1):nrow(data_filt)) {
+      if(sum(data_filt[i,]) <= sum(data_filt[j,])) {
+        N_paired = 0
+      }
+      else {
+        k_ij = 0
+        N_j = sum(data_filt[j,] > 0)
+        for (c in 1:ncol(data_filt)) {
+          if (data_filt[i,c] > data_filt[j,c] && data_filt[j,c] != 0){
+            k_ij = k_ij+1            }
+          }
+        N_paired = k_ij/N_j
+      }
+      WNODFr_temp= WNODFr_temp + N_paired
+    }
+  }
+  WNODFr = WNODFr_temp*100
+  # WNODF
+  m = dim(data_filt)[1]
+  n = dim(data_filt)[2]
+  wNODF_freq = append(wNODF_freq, 2*(WNODFc+WNODFr)/(m*(m-1)+(n*(n-1)))) 
 }
+  
 ###-----Volume wNODF------------------------------------------------------------
+rep_vol = 0
+wNODF_vol = c()
+for (n in 1:permutations) {
+  rep_vol = rep_vol + 1
+  trail_samp = sample(trilhas, 10)
+  
+  # Produce an horizonral version of the matrix
+  data_filt = group_by(data, Espécie, Classificação.2) %>% #groups by codigo and item
+    dplyr::summarise(Volume = sum(Volume)) %>% #sum quantity of each item
+    pivot_wider(names_from = Classificação.2,
+                values_from = Volume) %>%  
+    as.data.frame() %>% #changes dataset format to Codigo-row oriented
+    replace(is.na(.), 0) #removes NA and replaces with 0
+  
+  row.names(data_filt) = data_filt$Espécie
+  data_filt = dplyr:: select(data_filt, !Espécie)
+  data_filt = data_filt[,!names(data_filt) 
+                        %in% c("Não Identificado", "Semente", "Semente de capim", "Apenas substrato", "Vazio")]
+  
+  # Filter the Matrice
+  cols_to_remove = which(colSums(data_filt) < 5) # Min of 5 prey items
+  if (length(cols_to_remove) > 0) { # Check if is a int(0)
+    data_filt = data_filt[, -cols_to_remove] # Remove columns
+  }
+  rows_to_remove = which(rowSums(data_filt) == 0) # Check if there are items without a predator
+  if (length(rows_to_remove) > 0) { # Check if is a int(0)
+    data_filt = data_filt[-rows_to_remove,] # Remove columns
+  }
+  
+  # Re-order the interaction matrices
+  row_order = order(rowSums(data_filt), decreasing = TRUE) # Calculate row sums
+  data_filt = data_filt[row_order, ] # Use the index vector to reorder the rows of the matrix
+  col_order = order(colSums(data_filt), decreasing = TRUE) # Calculate col sums
+  data_filt = data_filt[,col_order] # Use the index vector to reorder the cols of the matrix
+  
+  ### Calculate wNODF Frequency permutation networks
+  
+  # WNODFc values for cols
+  WNODFc_temp = 0 # Create a temporary object for WNODFc
+  for (i in 1:(ncol(data_filt)-1)) { # for every i:n-1
+    for (j in (i+1):ncol(data_filt)) { # and for every i+1:n
+      if(sum(data_filt[,i]) <= sum(data_filt[,j])) { # if F(ci) <= F(cj)
+        N_paired = 0        
+      }
+      else {
+        k_ij = 0 # number of 1's in ci = cj, if cj != 0?
+        N_j = sum(data_filt[,j] > 0) # Cells > 0 in cj
+        for (r in 1:nrow(data_filt)) { # for every row in t cols sum k_ij
+          if (data_filt[r,i] > data_filt[r,j] && data_filt[r,j] != 0){
+            k_ij = k_ij+1            }
+        }
+        N_paired = k_ij/N_j
+      }
+      WNODFc_temp = WNODFc_temp + N_paired 
+    } 
+  }
+  WNODFc = WNODFc_temp*100
+  # WNODFr 
+  WNODFr_temp = 0
+  for (i in 1:(nrow(data_filt)-1)) {
+    for (j in (i+1):nrow(data_filt)) {
+      if(sum(data_filt[i,]) <= sum(data_filt[j,])) {
+        N_paired = 0
+      }
+      else {
+        k_ij = 0
+        N_j = sum(data_filt[j,] > 0)
+        for (c in 1:ncol(data_filt)) {
+          if (data_filt[i,c] > data_filt[j,c] && data_filt[j,c] != 0){
+            k_ij = k_ij+1            }
+        }
+        N_paired = k_ij/N_j
+      }
+      WNODFr_temp= WNODFr_temp + N_paired
+    }
+  }
+  WNODFr = WNODFr_temp*100
+  # WNODF
+  m = dim(data_filt)[1]
+  n = dim(data_filt)[2]
+  wNODF_vol = append(wNODF_vol, 2*(WNODFc+WNODFr)/(m*(m-1)+(n*(n-1)))) 
+}
+
 ##------p_value AND ggplot------------------------------------------------------
+p_value = list()
+p_value[["freq_mt"]] = sum(wNODF_freq >= WNODF_obs[["freq_mt"]]) / permutations
+p_value[["freq_eu"]] = sum(wNODF_freq >= WNODF_obs[["freq_eu"]]) / permutations
+p_value[["vol_eu"]] = sum(wNODF_vol >= WNODF_obs[["vol_eu"]]) / permutations
+p_value[["vol_mt"]] = sum(wNODF_vol >= WNODF_obs[["vol_mt"]]) / permutations
+
+# Plot the p_values
+f_path = "D:/Drive/Other computers/Meu laptop/LAB_VERT/Dieta_MV/Results/raw/wnodf_permutation_p_values.txt"
+
+sink(f_path)
+
+for (env in envs) {
+  cat(env, "\n")
+  cat("Observed Test Statistic:", WNODF_obs[[env]], "\n")
+  cat("P-Value:", p_value[[env]], "\n\n")
+}
+
+# Close the sink to stop redirecting output
+sink()
+
+
+library(ggplot2)
+# Example data for the histogram
+plot_data <- data.frame(Statistic = wNODF_freq)
+
+# Create a histogram
+ggplot(plot_data, aes(x = Statistic)) +
+  geom_histogram(binwidth = 0.2, fill = "blue", color = "black") +
+  geom_vline(xintercept = WNODF_obs[["freq_eu"]], color = "red", linetype = "dashed") +
+  geom_vline(xintercept = WNODF_obs[["freq_mt"]], color = "red", linetype = "dashed") +
+  labs(title = "Permutation Test",
+       x = "wNODF",
+       y = "Frequency") +
+  theme_minimal()
+
+
+
+
