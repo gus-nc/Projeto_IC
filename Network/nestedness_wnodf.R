@@ -127,7 +127,8 @@ for (n in 1:permutations) {
   trail_samp = sample(trilhas, 10)
   
   # Produce an horizonral version of the matrix
-  data_filt = group_by(data, Espécie, Classificação.2) %>% #groups by codigo and item
+  data_filt = filter(data, Trilha %in% trail_samp) %>%
+    group_by(Espécie, Classificação.2) %>% #groups by codigo and item
     dplyr::summarise(Quantidade = sum(Quantidade)) %>% #sum quantity of each item
     pivot_wider(names_from = Classificação.2,
               values_from = Quantidade) %>%  
@@ -211,7 +212,8 @@ for (n in 1:permutations) {
   trail_samp = sample(trilhas, 10)
   
   # Produce an horizonral version of the matrix
-  data_filt = group_by(data, Espécie, Classificação.2) %>% #groups by codigo and item
+  data_filt = filter(data, Trilha %in% trail_samp) %>%
+    group_by(Espécie, Classificação.2) %>% #groups by codigo and item
     dplyr::summarise(Volume = sum(Volume)) %>% #sum quantity of each item
     pivot_wider(names_from = Classificação.2,
                 values_from = Volume) %>%  
@@ -298,15 +300,13 @@ p_value[["vol_mt"]] = sum(wNODF_vol >= WNODF_obs[["vol_mt"]]) / permutations
 f_path = "D:/Drive/Other computers/Meu laptop/LAB_VERT/Dieta_MV/Results/raw/wnodf_permutation_p_values.txt"
 
 sink(f_path)
-
+cat("Permutations:", permutations, "\n")
 for (env in envs) {
   cat(env, "\n")
   cat("Observed Test Statistic:", WNODF_obs[[env]], "\n")
   cat("P-Value:", p_value[[env]], "\n\n")
 }
-
-# Close the sink to stop redirecting output
-sink()
+sink() # Close the sink to stop redirecting output
 
 
 library(ggplot2)
