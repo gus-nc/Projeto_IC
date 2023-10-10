@@ -1,0 +1,23 @@
+"Rhinella_icterica" "Proceratophrys_boiei" "Bokermannohyla_luctuosa" "Rhinella_ornata" "Ischnocnema_guentheri" "Dendropsophus_microps" "Physalaemus_olfersii" "Proceratophrys_itamari" "Ololygon_obtriangulata" "Scinax_aff._dolloi" "Hylodes_aff._sazimai" "Ischnocnema_holti"
+"Coleoptera" 569215 29715 737 3736 871 130 283 117 8 197 101 142
+"Diplopoda" 25644 42 0 1319 0 0 0 0 0 0 0 0
+"Opiliones" 15205 0 628 151 0 0 0 0 0 0 0 0
+"Heteroptera" 2714 0 5391 0 0 0 0 84 0 0 0 8
+"Formicidae" 4118 0 0 2417 84 0 259 0 0 0 0 0
+"Ensifera" 0 4105 804 0 0 0 0 0 0 0 0 0
+"Araneae" 0 0 2375 0 105 13 17 101 398 219 13 0
+"Dermaptera" 1977 0 0 0 377 0 0 0 0 0 0 0
+"Lepidoptera.Larva" 2011 0 0 0 0 0 0 0 0 0 0 0
+"Staphylinidae" 917 603 0 0 0 0 201 0 0 0 0 0
+"Coleoptera.Larva" 1470 0 0 0 0 0 0 0 0 0 0 5
+"Hemiptera" 0 0 0 1257 0 0 0 0 0 0 0 0
+"Isópode" 113 151 0 0 0 0 0 289 0 0 0 0
+"Isoptera" 0 0 0 0 0 327 0 0 0 0 0 0
+"Mosca" 0 0 0 0 0 302 0 0 0 0 0 0
+"Larva" 168 0 0 0 0 0 0 0 0 0 0 0
+"Vespa" 0 0 0 0 0 0 0 0 0 0 101 13
+"Blattodea" 0 0 17 0 0 0 0 0 0 0 0 34
+"Collembola" 0 0 0 0 0 0 0 0 0 0 50 0
+"Pterygota" 0 0 0 0 0 0 0 0 50 0 0 0
+"Chilopoda" 0 34 0 0 0 0 0 0 0 0 0 0
+"Acari" 0 8 4 0 0 0 0 0 0 0 0 0

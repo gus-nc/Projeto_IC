@@ -1,0 +1,13 @@
+"Chiasmocleis_mantiqueira" "Ischnocnema_juipoca" "Physalaemus_olfersii" "Ischnocnema_guentheri" "Rhinella_icterica"
+"Formicidae" 78 2 15 0 0
+"Coleoptera" 3 5 1 5 13
+"Araneae" 0 9 0 0 0
+"Blattodea" 0 0 0 3 0
+"Chilopoda" 0 1 0 2 0
+"Opiliones" 0 0 0 3 0
+"Lepidoptera.Larva" 0 2 0 0 0
+"Staphylinidae" 0 1 0 1 0
+"Acari" 1 0 0 0 0
+"Collembola" 0 1 0 0 0
+"Dermaptera" 0 0 0 1 0
+"Vespa" 0 1 0 0 0
