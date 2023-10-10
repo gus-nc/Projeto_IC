@@ -310,19 +310,33 @@ sink() # Close the sink to stop redirecting output
 
 
 library(ggplot2)
+png(filename = "C:/Users/nunes/Documentos/LAB_VERT/Dieta_MV/Results/raw/perm_freq_wnodf.png"
+    , width = 1000, height = 800)
 # Example data for the histogram
 plot_data <- data.frame(Statistic = wNODF_freq)
 
-# Create a histogram
+# Create histogram for Frequency Permutation
 ggplot(plot_data, aes(x = Statistic)) +
   geom_histogram(binwidth = 0.2, fill = "blue", color = "black") +
   geom_vline(xintercept = WNODF_obs[["freq_eu"]], color = "red", linetype = "dashed") +
   geom_vline(xintercept = WNODF_obs[["freq_mt"]], color = "red", linetype = "dashed") +
-  labs(title = "Permutation Test",
+  labs(title = "Permutation for Frequency Based wNODF",
        x = "wNODF",
        y = "Frequency") +
   theme_minimal()
+dev.off()
 
-
-
+png(filename = "C:/Users/nunes/Documentos/LAB_VERT/Dieta_MV/Results/raw/perm_vol_wnodf.png"
+    , width = 1000, height = 800)
+plot_data <- data.frame(Statistic = wNODF_vol)
+# Create histogram for Volume Permutation
+ggplot(plot_data, aes(x = Statistic)) +
+  geom_histogram(binwidth = 0.2, fill = "blue", color = "black") +
+  geom_vline(xintercept = WNODF_obs[["vol_eu"]], color = "red", linetype = "dashed") +
+  geom_vline(xintercept = WNODF_obs[["vol_mt"]], color = "red", linetype = "dashed") +
+  labs(title = "Permutation for Volume Based wNODF",
+       x = "wNODF",
+       y = "Frequency") +
+  theme_minimal()
+dev.off()
 
