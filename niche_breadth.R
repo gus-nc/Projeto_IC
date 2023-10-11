@@ -112,3 +112,5 @@ tab_1
 
 #Save as PNG
 gtsave(tab_1, filename = "Niche_Breadth.png", path = "D:/Drive/Other computers/Meu laptop/LAB_VERT/Dieta_MV/Results/")
+# OR for Laptop
+gtsave(tab_1, filename = "Niche_Breadth.png", path = "C:/Users/nunes/Documentos/LAB_VERT/Dieta_MV/Results")
