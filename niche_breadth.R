@@ -101,7 +101,7 @@ library(gtExtras)
 tab_1 = df |> 
   gt(rownames_to_stub = TRUE) |> 
   tab_header(
-    title = "Niche Overlap ",
+    title = "Niche Breadth",
     subtitle = "Co-occuring species in Mata Atlântica and Eucalyptus"
   ) |> 
   fmt_number(columns = colnames(df), decimals = 4) |> 
@@ -112,4 +112,3 @@ tab_1
 
 #Save as PNG
 gtsave(tab_1, filename = "Niche_Breadth.png", path = "D:/Drive/Other computers/Meu laptop/LAB_VERT/Dieta_MV/Results/")
-
