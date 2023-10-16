@@ -51,31 +51,50 @@ for (env in envs) { # Convert each matrix into a relative abundance matrix
 }
 ###-----------------------------------------------------------------------------
 ### Plot the Barplots in LAPTOP
+# Define the names abreviations
+abrev = as.matrix(read.csv("Item_abreviations.csv", header = T, row.names = 1))
+rownames(abrev) = gsub(" ", ".", rownames(abrev))
+
+for (env in envs) {
+  for (i in 1:length(avail[[env]])) {
+    names(avail[[env]])[i] = abrev[names(avail[[env]][i]),]
+  }
+}
 
 # Plot the availability graphs
 for (env in freq_envs) {
   png(filename = paste("C:/Users/nunes/Documentos/LAB_VERT/Dieta_MV/Results/raw/eligibility/", 
-                       env, "_avail.png", sep = ""), width = 500, height = 250)
-  par(mar = c(5,6,3,1))
+                       env, "_avail.png", sep = ""), width = 800, height = 700)
+  par(mai = c(0.5,1.5,0.5,0.3))
   barplot(avail[[env]], ylab = "Abundance of Prey \n (Frequency)", 
         ylim = c(0, max(avail[[env]])+50), names.arg = "", cex.axis = 1.5, lwd =2, cex.lab=1.5)
   bar_midpoints = barplot(avail[[env]], plot = FALSE)
   axis(side = 1, at = bar_midpoints, labels = FALSE, lwd = 2)
-  axis(side = 1, at = bar_midpoints, labels = names(avail[[env]]), cex.axis = 1.5, las = 2)
-  
+  text(x = bar_midpoints,
+       y = par("usr")[3],
+       labels = names(avail[[env]]),
+       xpd = NA,
+       pos = 1,
+       offset = 1,
+       cex = 1.2)
   dev.off()
 }
 
 for (env in vol_envs) {
   png(filename = paste("C:/Users/nunes/Documentos/LAB_VERT/Dieta_MV/Results/raw/eligibility/", 
-                       env, "_avail.png", sep = ""), width = 500, height = 250)
-  par(mar = c(5,6,3,1))
+                       env, "_avail.png", sep = ""), width = 800, height = 700)
+  par(mai = c(0.5,1.5,0.5,0.3))
   barplot(avail[[env]], ylab = "Abundance of Prey \n (Volume)", 
           ylim = c(0, max(avail[[env]])+50), names.arg = "", cex.axis = 1.5, lwd =2, cex.lab=1.5)
   bar_midpoints = barplot(avail[[env]], plot = FALSE)
   axis(side = 1, at = bar_midpoints, labels = FALSE, lwd = 2)
-  axis(side = 1, at = bar_midpoints, labels = names(avail[[env]]), cex.axis = 1.5, las = 2)
-  
+  text(x = bar_midpoints,
+       y = par("usr")[3],
+       labels = names(avail[[env]]),
+       xpd = NA,
+       pos = 1,
+       offset = 1,
+       cex = 1.2)
   dev.off()
 }
 
@@ -83,23 +102,21 @@ for (env in vol_envs) {
 # Plot the respective species graphs
 for (env in envs) {
   png(filename = paste("C:/Users/nunes/Documentos/LAB_VERT/Dieta_MV/Results/raw/eligibility/", 
-                       env, "_elig.png", sep = ""), width = 500, height = 3000)
-  layout(c(1:dim(webs[[env]])[2]),12)
+                       env, "_elig.png", sep = ""), width = 800, height = 3000)
+  layout(c(1:(dim(webs[[env]])[2])))
   for (j in 1:dim(webs[[env]])[2]) {
-    par(mar = c(2,5,2,2))
+    par(mai = c(0.5,1.5,0.5,0.3))
     barplot(elec_matrix[[env]][,j], width = , ylim = c(0, max(elec_matrix[[env]][,j])+0.1), 
-             names.arg = "", cex.axis = 1.5, lwd =2, axis.lty= 0)
+            names.arg = "", cex.axis = 1.5, lwd =2, axis.lty= 0)
     mtext(colnames(webs[[env]])[j], side = 3, line = 0, at = max(par("usr")[1], par("usr")[2]), cex = 1.5, font = 3, adj =1)
   
     bar_midpoints = barplot(elec_matrix[[env]][,j], plot = FALSE)
-    axis(side = 1, at = bar_midpoints-1.2, labels = FALSE, lwd = 2)
+    axis(side = 1, at = bar_midpoints, labels = FALSE, lwd = 2)
     
-    axis(side = 1, at = bar_midpoints+1.2, labels = FALSE, lwd = 2)
     }
-  # mtext("Y-Axis Label", side = 2, line = 3, cex = 3)
+  mtext("Abundance of Prey \n (Volume)", side = 2, line = 3, cex=1.5)
   dev.off()
 }
-
 
 ###-----------------------------------------------------------------------------
 ### Plot the Barplots in PC ###
