@@ -111,12 +111,12 @@ for (env in envs) { # For each environment
 ###-----  
 library(dplyr)
 library(tidyverse)
-how_much = factorial(20)/(factorial(10)*factorial(10))
+factorial(20)/(factorial(10)*factorial(10)) # How much possible permutations
 
 # Produce one big fat matrix
 data = read.csv("Data_filtered.csv", header=T, dec= ",", row.names=NULL)
 
-permutations = 100 # number of permutations
+permutations = 10000 # number of permutations
 trilhas = sort(unique(data$"Trilha")) # unique sample points
 
 ###-----Frequency wNODF---------------------------------------------------------
