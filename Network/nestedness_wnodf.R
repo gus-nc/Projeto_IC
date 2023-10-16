@@ -310,9 +310,11 @@ sink() # Close the sink to stop redirecting output
 
 
 library(ggplot2)
-png(filename = "C:/Users/nunes/Documentos/LAB_VERT/Dieta_MV/Results/raw/perm_freq_wnodf.png"
-    , width = 1000, height = 800)
-# Example data for the histogram
+# png(filename = "C:/Users/nunes/Documentos/LAB_VERT/Dieta_MV/Results/raw/perm_freq_wnodf.png"
+    #, width = 1000, height = 800) # LAPTOP
+png(filename = "D:/Drive/Other computers/Meu laptop/LAB_VERT/Dieta_MV/Results/raw/perm_freq_wnodf.png"
+    , width = 1000, height = 800) # PC
+# Data for the histogram
 plot_data <- data.frame(Statistic = wNODF_freq)
 
 # Create histogram for Frequency Permutation
@@ -326,8 +328,12 @@ ggplot(plot_data, aes(x = Statistic)) +
   theme_minimal()
 dev.off()
 
-png(filename = "C:/Users/nunes/Documentos/LAB_VERT/Dieta_MV/Results/raw/perm_vol_wnodf.png"
-    , width = 1000, height = 800)
+#png(filename = "C:/Users/nunes/Documentos/LAB_VERT/Dieta_MV/Results/raw/perm_vol_wnodf.png"
+#    , width = 1000, height = 800) # LAPTOP
+png(filename = "D:/Drive/Other computers/Meu laptop/LAB_VERT/Dieta_MV/Results/raw/perm_vol_wnodf.png"
+    , width = 1000, height = 800) # PC
+
+# Data for the histogram
 plot_data <- data.frame(Statistic = wNODF_vol)
 # Create histogram for Volume Permutation
 ggplot(plot_data, aes(x = Statistic)) +
