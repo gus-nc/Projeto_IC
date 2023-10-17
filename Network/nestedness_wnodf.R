@@ -62,10 +62,10 @@ WNODF_obs = list() # List for storing the final value for each matrix
 for (env in envs) { # For each environment
   # WNODFc values for cols
   WNODFc_temp = 0 # Create a temporary object for WNODFc
-  for (i in 1:(ncol(webs[[env]])-1)) { # for every i:n-1
-    for (j in (i+1):ncol(webs[[env]])) { # and for every i+1:n
+  for (i in 1:(ncol(webs[[env]])-1)) { # for every col i:n-1
+    for (j in (i+1):ncol(webs[[env]])) { # and for every col i+1:n
       if(sum(webs[[env]][,i]) <= sum(webs[[env]][,j])) { # if F(ci) <= F(cj)
-        N_paired = 0
+        N_paired = 0 # The Nested Value for this pair of cols
       }
       else {
         k_ij = 0 # number of 1's in ci = cj, if cj != 0?
@@ -75,36 +75,36 @@ for (env in envs) { # For each environment
             k_ij = k_ij+1
           }
         }
-        N_paired = k_ij/N_j
+        N_paired = k_ij/N_j # The Nested Value for this pair of cols
       }
       WNODFc_temp = WNODFc_temp + N_paired 
     }
   }
   WNODFc[[env]] = WNODFc_temp*100
-  # WNODFr 
-  WNODFr_temp = 0
-  for (i in 1:(nrow(webs[[env]])-1)) {
-    for (j in (i+1):nrow(webs[[env]])) {
-      if(sum(webs[[env]][i,]) <= sum(webs[[env]][j,])) {
-        N_paired = 0
+  # WNODFr values for rows
+  WNODFr_temp = 0 # Create a temporary object for WNODFr
+  for (i in 1:(nrow(webs[[env]])-1)) { # for every col i:n-1
+    for (j in (i+1):nrow(webs[[env]])) { # and for every col i+1:n
+      if(sum(webs[[env]][i,]) <= sum(webs[[env]][j,])) { # if F(ci) <= F(cj)
+        N_paired = 0 # The Nested Value for this pair of cols
       }
       else {
-        k_ij = 0
-        N_j = sum(webs[[env]][j,] > 0)
-        for (c in 1:ncol(webs[[env]])) {
+        k_ij = 0 # number of 1's in ci = cj, if cj != 0?
+        N_j = sum(webs[[env]][j,] > 0)  #Cells > 0 in cj
+        for (c in 1:ncol(webs[[env]])) { # for every row in t cols sum k_ij
           if (webs[[env]][i,c] > webs[[env]][j,c] && webs[[env]][j,c] != 0){
             k_ij = k_ij+1
           }
         }
-        N_paired = k_ij/N_j
+        N_paired = k_ij/N_j # The Nested Value for this pair of cols
       }
       WNODFr_temp= WNODFr_temp + N_paired
     }
   }
   WNODFr[[env]] = WNODFr_temp*100
   # WNODF
-  m = dim(webs[[env]])[1]
-  n = dim(webs[[env]])[2]
+  m = dim(webs[[env]])[1] # Number of rows
+  n = dim(webs[[env]])[2] # Number of cols
   WNODF_obs[[env]] = 2*(WNODFc[[env]]+WNODFr[[env]])/ # The final average of WNODF for the env matrix
     (m*(m-1)+(n*(n-1)))
 }

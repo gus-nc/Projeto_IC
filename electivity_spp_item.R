@@ -17,6 +17,8 @@ links_mt_freq = t(as.matrix(read.csv("Diet_M_Freq_Xincomp.csv", header = T, row.
 webs = list(links_eu_vol, links_mt_vol, links_eu_freq, links_mt_freq) # create a list w/ the matrices
 envs = c("vol_eu", "vol_mt", "freq_eu", "freq_mt") # names of each env and type combination
 names(webs) = envs # name the list
+freq_envs = c("freq_eu", "freq_mt")
+vol_envs = c("vol_eu", "vol_mt")
 
 # Filter 
 rows_to_remove_eu = which(rowSums(webs$freq_eu) == 0) # Check if there are items without a predator
@@ -64,7 +66,7 @@ for (env in envs) {
 # Plot the availability graphs
 for (env in freq_envs) {
   png(filename = paste("C:/Users/nunes/Documentos/LAB_VERT/Dieta_MV/Results/raw/eligibility/", 
-                       env, "_avail.png", sep = ""), width = 800, height = 700)
+                       env, "_avail.png", sep = ""), width = 800, height = 300)
   par(mai = c(0.5,1.5,0.5,0.3))
   barplot(avail[[env]], ylab = "Abundance of Prey \n (Frequency)", 
         ylim = c(0, max(avail[[env]])+50), names.arg = "", cex.axis = 1.5, lwd =2, cex.lab=1.5)
@@ -82,7 +84,7 @@ for (env in freq_envs) {
 
 for (env in vol_envs) {
   png(filename = paste("C:/Users/nunes/Documentos/LAB_VERT/Dieta_MV/Results/raw/eligibility/", 
-                       env, "_avail.png", sep = ""), width = 800, height = 700)
+                       env, "_avail.png", sep = ""), width = 800, height = 300)
   par(mai = c(0.5,1.5,0.5,0.3))
   barplot(avail[[env]], ylab = "Abundance of Prey \n (Volume)", 
           ylim = c(0, max(avail[[env]])+50), names.arg = "", cex.axis = 1.5, lwd =2, cex.lab=1.5)
@@ -97,7 +99,6 @@ for (env in vol_envs) {
        cex = 1.2)
   dev.off()
 }
-
 
 # Plot the respective species graphs
 for (env in envs) {
