@@ -1,9 +1,9 @@
 ###
 ### Calculating indices related to the P(k) degree distribution
-###-----------------------------------------------------------------------------
+###-----Set a Directory---------------------------------------------------------
 setwd("C:/Users/nunes/Documentos/Code/Projeto_IC") # Laptop
 setwd("D:/Drive/Other computers/Meu laptop/Code/Projeto_IC") # PC
-###-----------------------------------------------------------------------------
+###-----Import and Filter the Matrices------------------------------------------
 # Import the matrices and create a webs object
 # A matrix as > higher trophic level species=anurans (columns) 
 # and lower trophic level species=prey (rows).
@@ -44,7 +44,7 @@ if (length(rows_to_remove_mt) > 0) { # Check if is a int(0)
   webs$vol_mt = webs$vol_mt[-rows_to_remove_mt,] # Remove columns
   webs$freq_mt = webs$freq_mt[-rows_to_remove_mt,] # Remove columns
 }
-###-----------------------------------------------------------------------------
+###-----Network Size and Connectance--------------------------------------------
 #1 Network Size
 ind_size = list ()
 for (env in envs) {
@@ -59,7 +59,7 @@ for (env in envs) {
 }
 print(ind_connect)
 
-#3 Simple Degree distribution
+###------Simple Degree distribution---------------------------------------------
 # Predator degree 
 pred_k = list()
 pred_hi = list()
@@ -83,12 +83,48 @@ for (env in envs) {
 # Plot all the histograms
 # Eucalyptus Vs Atlântic Forest Predator P(k)
 barplot(pred_hi[["freq_eu"]]$density, names.arg = c(1:max(pred_k[["freq_eu"]][["distr"]])),
-        xlab = "Predator degree", ylab = "Frequency")
+        xlab = "Predator degree (k)", ylab = "P(k)")
 barplot(pred_hi[["freq_mt"]]$density, names.arg = c(1:max(pred_k[["freq_mt"]][["distr"]])),
-        xlab = "Predator degree", ylab = "Frequency")
+        xlab = "Predator degree (k)", ylab = "P(k)")
 
 # Eucalyptus Vs Atlântic Forest Prey P(k)
 barplot(prey_hi[["freq_eu"]]$density, names.arg = c(1:max(prey_k[["freq_eu"]][["distr"]])),
-        xlab = "Prey degree", ylab = "Frequency")
+        xlab = "Prey degree (k)", ylab = "P(k)")
 barplot(prey_hi[["freq_mt"]]$density, names.arg = c(1:max(prey_k[["freq_mt"]][["distr"]])),
-        xlab = "Prey degree", ylab = "Frequency")
+        xlab = "Prey degree (k)", ylab = "P(k)")
+
+###------Cumulative Degree distribution-----------------------------------------
+# Predator degree 
+cum_pred_k = list()
+cum_pred_hi = list()
+
+# Create the cumulative distribution histogram
+for (env in envs) {
+  ktemp = colSums(webs[[env]][,colnames(webs[[env]])] > 0) # Create a list inside envlist() with the values
+  cum_pred_hi[[env]] = hist(ktemp, 0:max(ktemp), plot = FALSE) # Histogram
+  cum_pred_hi[[env]][["counts"]] = cumsum(cum_pred_hi[[env]][["counts"]]) # set the counts as cumulative
+}
+
+# Prey item degree
+cum_prey_k = list()
+cum_prey_hi = list()
+
+# Create the cumulative distribution histogram
+for (env in envs) {
+  ktemp = rowSums(webs[[env]][,colnames(webs[[env]])] > 0) # Create a list inside envlist() with the values
+  cum_prey_hi[[env]] = hist(ktemp, 0:max(ktemp), plot = FALSE) # Histogram
+  cum_prey_hi[[env]][["counts"]] = cumsum(cum_prey_hi[[env]][["counts"]]) # set the counts as cumulative
+}
+
+# Plot all the histograms
+# Eucalyptus Vs Atlântic Forest Predator P(k)
+barplot(cum_pred_hi[["freq_eu"]]$counts, names.arg = c(1:max(pred_k[["freq_eu"]][["distr"]])),
+        xlab = "Predator degree (k)", ylab = "P(k)")
+barplot(cum_pred_hi[["freq_mt"]]$counts, names.arg = c(1:max(pred_k[["freq_mt"]][["distr"]])),
+        xlab = "Predator degree (k)", ylab = "P(k)")
+
+# Eucalyptus Vs Atlântic Forest Prey P(k)
+barplot(cum_prey_hi[["freq_eu"]]$counts, names.arg = c(1:max(prey_k[["freq_eu"]][["distr"]])),
+        xlab = "Prey degree (k)", ylab = "P(k)")
+barplot(cum_prey_hi[["freq_mt"]]$counts, names.arg = c(1:max(prey_k[["freq_mt"]][["distr"]])),
+        xlab = "Prey degree (k)", ylab = "P(k)")

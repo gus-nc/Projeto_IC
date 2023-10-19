@@ -1,5 +1,5 @@
 ###
-### Calculating Nestedness for the networks
+### Calculating Nestedness for the networks according to Almeida-Neto 2011
 ###-----Set Directory-----------------------------------------------------------
 setwd("C:/Users/nunes/Documentos/Code/Projeto_IC") # Laptop
 setwd("D:/Drive/Other computers/Meu laptop/Code/Projeto_IC") # PC
