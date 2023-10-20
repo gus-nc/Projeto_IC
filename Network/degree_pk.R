@@ -100,9 +100,14 @@ cum_pred_hi = list()
 
 # Create the cumulative distribution histogram
 for (env in envs) {
+  sum_vector = c()
   ktemp = colSums(webs[[env]][,colnames(webs[[env]])] > 0) # Create a list inside envlist() with the values
   cum_pred_hi[[env]] = hist(ktemp, 0:max(ktemp), plot = FALSE) # Histogram
-  cum_pred_hi[[env]][["counts"]] = cumsum(cum_pred_hi[[env]][["counts"]]) # set the counts as cumulative
+  for (i in 1:length(cum_pred_hi[[env]][["counts"]])) {
+    sum_vector[i] = sum(cum_pred_hi[[env]][["counts"]][i:length(cum_pred_hi[[env]][["counts"]])])
+  }
+  cum_pred_hi[[env]][["inv_count"]] = sum_vector
+  cum_pred_hi[[env]][["inv_density"]] = sum_vector/max(sum_vector)
 }
 
 # Prey item degree
@@ -111,20 +116,26 @@ cum_prey_hi = list()
 
 # Create the cumulative distribution histogram
 for (env in envs) {
+  sum_vector = c()
   ktemp = rowSums(webs[[env]][,colnames(webs[[env]])] > 0) # Create a list inside envlist() with the values
   cum_prey_hi[[env]] = hist(ktemp, 0:max(ktemp), plot = FALSE) # Histogram
-  cum_prey_hi[[env]][["counts"]] = cumsum(cum_prey_hi[[env]][["counts"]]) # set the counts as cumulative
+  for (i in 1:length(cum_prey_hi[[env]][["counts"]])) {
+    sum_vector[i] = sum(cum_prey_hi[[env]][["counts"]][i:length(cum_prey_hi[[env]][["counts"]])])
+  }
+  cum_prey_hi[[env]][["inv_count"]] = sum_vector
+  cum_prey_hi[[env]][["inv_density"]] = sum_vector/max(sum_vector)
 }
 
-# Plot all the histograms
+x# Plot all the histograms
 # Eucalyptus Vs Atlântic Forest Predator P(k)
-barplot(cum_pred_hi[["freq_eu"]]$counts, names.arg = c(1:max(pred_k[["freq_eu"]][["distr"]])),
+barplot(cum_pred_hi[["freq_eu"]]$inv_density, names.arg = c(1:max(pred_k[["freq_eu"]][["distr"]])),
         xlab = "Predator degree (k)", ylab = "P(k)")
-barplot(cum_pred_hi[["freq_mt"]]$counts, names.arg = c(1:max(pred_k[["freq_mt"]][["distr"]])),
+barplot(cum_pred_hi[["freq_mt"]]$inv_density, names.arg = c(1:max(pred_k[["freq_mt"]][["distr"]])),
         xlab = "Predator degree (k)", ylab = "P(k)")
 
 # Eucalyptus Vs Atlântic Forest Prey P(k)
-barplot(cum_prey_hi[["freq_eu"]]$counts, names.arg = c(1:max(prey_k[["freq_eu"]][["distr"]])),
+barplot(cum_prey_hi[["freq_eu"]]$inv_density, names.arg = c(1:max(prey_k[["freq_eu"]][["distr"]])),
         xlab = "Prey degree (k)", ylab = "P(k)")
-barplot(cum_prey_hi[["freq_mt"]]$counts, names.arg = c(1:max(prey_k[["freq_mt"]][["distr"]])),
+barplot(cum_prey_hi[["freq_mt"]]$inv_density, names.arg = c(1:max(prey_k[["freq_mt"]][["distr"]])),
         xlab = "Prey degree (k)", ylab = "P(k)")
+
