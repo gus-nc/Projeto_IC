@@ -126,7 +126,7 @@ for (env in envs) {
   cum_prey_hi[[env]][["inv_density"]] = sum_vector/max(sum_vector)
 }
 
-x# Plot all the histograms
+# Plot all the histograms
 # Eucalyptus Vs Atlântic Forest Predator P(k)
 barplot(cum_pred_hi[["freq_eu"]]$inv_density, names.arg = c(1:max(pred_k[["freq_eu"]][["distr"]])),
         xlab = "Predator degree (k)", ylab = "P(k)")
@@ -139,3 +139,9 @@ barplot(cum_prey_hi[["freq_eu"]]$inv_density, names.arg = c(1:max(prey_k[["freq_
 barplot(cum_prey_hi[["freq_mt"]]$inv_density, names.arg = c(1:max(prey_k[["freq_mt"]][["distr"]])),
         xlab = "Prey degree (k)", ylab = "P(k)")
 
+
+# Save as PNG files
+png(filename = "D:/Drive/Other computers/Meu laptop/LAB_VERT/Dieta_MV/Results/raw/inv_mt_prey_pk.png"
+    , width = 700, height = 600) # PC
+
+dev.off()
