@@ -79,6 +79,57 @@ fraction_analysis = function(x, fraction) {
   return(mat_fdca)
 }
 
+### Function for calculating Nestedness NODF for 1 matrix
+Nestedness_NODF = function(x) {
+  
+  NODFc_temp = 0 # Create a temporary object for NODFc
+  for (i in 1:(ncol(x)-1)) { # for every col i:n-1
+    for (j in (i+1):ncol(x)) { # and for every col i+1:n
+      if(sum(x[,i]) <= sum(x[,j])) { # if F(ci) <= F(cj)
+        N_paired = 0 # The Nested Value for this pair of cols
+      }
+      else {
+        PO = 0 # number of 1's in ci = cj, if cj != 0?
+        N_j = sum(x[,j] == 1) # Cells > 0 in cj
+        for (r in 1:nrow(x)) { # for every row in t cols sum PO
+          if (x[r,i] == 1 && x[r,j] == 1){
+            PO = PO+1
+          }
+        }
+        N_paired = PO/N_j # The Nested Value for this pair of cols
+      }
+      NODFc_temp = NODFc_temp + N_paired
+    }
+  }
+  NODFc = NODFc_temp*100
+  # NODFr values for rows
+  NODFr_temp = 0 # Create a temporary object for NODFr
+  for (i in 1:(nrow(x)-1)) { # for every col i:n-1
+    for (j in (i+1):nrow(x)) { # and for every col i+1:n
+      if(sum(x[i,]) <= sum(x[j,])) { # if F(ci) <= F(cj)
+        N_paired = 0 # The Nested Value for this pair of cols
+      }
+      else {
+        PO = 0 # number of 1's in ci = cj, if cj != 0?
+        N_j = sum(x[j,] == 1)  #Cells > 0 in cj
+        for (c in 1:ncol(x)) { # for every row in t cols sum PO
+          if (x[i,c] == 1 && x[j,c] == 1){
+            PO = PO+1
+          }
+        }
+        N_paired = PO/N_j # The Nested Value for this pair of cols
+      }
+      NODFr_temp= NODFr_temp + N_paired
+    }
+  }
+  NODFr = NODFr_temp*100
+  # NODF
+  m = dim(x)[1] # Number of rows
+  n = dim(x)[2] # Number of cols
+  NODF_obs = 2*(NODFc+NODFr)/ # The final average of NODF for the env matrix
+    (m*(m-1)+(n*(n-1)))
+  return(c(NODFc, NODFr, NODF_obs))
+}
 
 ###-----Import Martrices--------------------------------------------------------
 # Import the matrices and create a webs list
@@ -90,14 +141,50 @@ envs = c("freq_eu", "freq_mt")
 net = import_and_cut(files, envs, n = 5)
 
 ###-----Execute FDCA------------------------------------------------------------
-frac = c(0.1, 0.9)
+frac = seq(0.1, 0.9, by = 0.1)
 frac_matrices = fraction_analysis(net, fraction = frac)
 
-
-# Re-order the interaction matrices
+# Re-order the interaction matrices, removes rows that sum == 0 and make then binary
 for (env in envs) {
-  row_order = order(rowSums(webs[[env]]), decreasing = TRUE) # Calculate row sums
-  webs[[env]] = webs[[env]][row_order, ] # Use the index vector to reorder the rows of the matrix
-  col_order = order(colSums(webs[[env]]), decreasing = TRUE) # Calculate col sums
-  webs[[env]] = webs[[env]][,col_order] # Use the index vector to reorder the cols of the matrix
+  for (f in frac) {
+    frac_matrices[[env]][[as.character(f)]] = ifelse(frac_matrices[[env]][[as.character(f)]] > 0, 1, frac_matrices[[env]][[as.character(f)]])
+    
+    row_order = order(rowSums(frac_matrices[[env]][[as.character(f)]]), decreasing = TRUE) # Calculate row sums
+    frac_matrices[[env]][[as.character(f)]] = frac_matrices[[env]][[as.character(f)]][row_order, ] # Use the index vector to reorder the rows of the matrix
+    col_order = order(colSums(frac_matrices[[env]][[as.character(f)]]), decreasing = TRUE) # Calculate col sums
+    frac_matrices[[env]][[as.character(f)]] = frac_matrices[[env]][[as.character(f)]][,col_order] # Use the index vector to reorder the cols of the matrix
+    rows_to_remove = which(rowSums(frac_matrices[[env]][[as.character(f)]]) == 0) # Only for freq bc it reveals the discrete number of preys
+      if (length(rows_to_remove) > 0) { # Check if is a int(0
+        frac_matrices[[env]][[as.character(f)]] =frac_matrices[[env]][[as.character(f)]][-rows_to_remove,] # Remove rows
+      }
+  }
 }
+
+# Incorportate the Original matrix
+frac = c(frac, 1)
+
+for (env in envs) {
+  frac_matrices[[env]][["1"]] = net[[env]]
+  frac_matrices[[env]][["1"]] = ifelse(frac_matrices[[env]][["1"]] > 0, 1, frac_matrices[[env]][["1"]])
+  
+  row_order = order(rowSums(frac_matrices[[env]][["1"]]), decreasing = TRUE) # Calculate row sums
+  frac_matrices[[env]][["1"]] = frac_matrices[[env]][["1"]][row_order, ] # Use the index vector to reorder the rows of the matrix
+  col_order = order(colSums(frac_matrices[[env]][["1"]]), decreasing = TRUE) # Calculate col sums
+  frac_matrices[[env]][["1"]] = frac_matrices[[env]][["1"]][,col_order] # Use the index vector to reorder the cols of the matrix
+  rows_to_remove = which(rowSums(frac_matrices[[env]][["1"]]) == 0) # Only for freq bc it reveals the discrete number of preys
+  if (length(rows_to_remove) > 0) { # Check if is a int(0
+    frac_matrices[[env]][["1"]] =frac_matrices[[env]][["1"]][-rows_to_remove,] # Remove rows
+  }
+  
+}
+
+
+###----- Nestedness analysis----------------------------------------------------
+NODF_results = list()
+
+for (env in envs) {
+  for (f in frac) {
+    NODF_results[[env]][[as.character]] = Nestedness_NODF(frac_matrices[[env]][[as.character(f)]])
+  }
+}
+
