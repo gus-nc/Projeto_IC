@@ -38,10 +38,14 @@ fraction_analysis = function(x, fraction) {
   mat_fdca = list()
   mat_names = names(x)
   for (f in fraction) {
-  rep = 0
-  for (k in x) {
-    rep = rep + 1
-    k = apply(k, MARGIN = 2, function(x) sort(x, decreasing = TRUE))
+    rep = 0
+    for (k in x) {
+      k_mod = matrix(0, nrow = dim(k)[1], ncol = dim(k)[2], dimnames = list(c(rownames(k)),c(colnames(k))))
+      rep = rep + 1
+    
+    # If I do this I loose the names information
+    # k = apply(k, MARGIN = 2, function(x) sort(x, decreasing = TRUE))
+
     for (j in 1:dim(k)[2]) {
       data = k[,j] # Extract a column to analyze
       total_sum = sum(data)  # Calculate the total sum of the column
@@ -49,31 +53,30 @@ fraction_analysis = function(x, fraction) {
       sorted_data = sort(data, decreasing = TRUE) # Sort the data in descending order
        
       # Initialize variables to store retained values and cumulative sum
-      retained_values = numeric(0)
+      retained_values = c()
       cumulative_sum = 0
       
       # Iterate through the sorted data to retain values
+      int_count = 0
       for (value in sorted_data) {
-        if (cumulative_sum + value <= threshold) {
-          retained_values = c(retained_values, value)
+        int_count = int_count + 1
+        if (cumulative_sum + value < threshold) {
+          retained_values[names(sorted_data)[int_count]] = value
           cumulative_sum = cumulative_sum + value
         } 
         else { # Iterate one time to include thye category tha surpass the treshold
-          retained_values = c(retained_values, value) 
+          retained_values[names(sorted_data)[int_count]] = value
           cumulative_sum = cumulative_sum + value
           break
         }
       }
       # Store only the retained_values in the new matrix
       for (i in 1:length(retained_values)) {
-        k[i,j] = retained_values[i] 
+        k_mod[names(retained_values[i]),j] = retained_values[i] 
       }
-      for (i in (length(retained_values)+1):dim(k)[1]) {
-        k[i,j] = 0
-      }
+      mat_fdca[[mat_names[rep]]][[as.character(f)]] = k_mod
     }
-    mat_fdca[[mat_names[rep]]][[as.character(f)]] = k
-  }
+    }
   }
   # Return retained values and their sum
   return(mat_fdca)
@@ -179,12 +182,13 @@ for (env in envs) {
 }
 
 
-###----- Nestedness analysis----------------------------------------------------
+###-----Nestedness analysis-----------------------------------------------------
 NODF_results = list()
 
 for (env in envs) {
   for (f in frac) {
-    NODF_results[[env]][[as.character]] = Nestedness_NODF(frac_matrices[[env]][[as.character(f)]])
+    NODF_results[[env]][[as.character(f)]] = Nestedness_NODF(frac_matrices[[env]][[as.character(f)]])[3]
   }
 }
 
+###-----Plotting the Results----------------------------------------------------
